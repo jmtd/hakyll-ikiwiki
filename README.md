@@ -25,3 +25,21 @@ out how to plumb the collated Metadata back into Hakyll.
 I want to support IkiWiki's `[[!template]]`, where possible, and plan to see if
 translating them into Hakyll's template tokens (e.g.
 `$partial("filename.html")$`) as inline text works or not.
+
+## Example in use
+
+I will add a complete demo Hakyll site to this repository eventually. Here's a
+snippet showing how to integrate:
+
+```
+import           IkiWiki
+…
+    match (fromList ["about.rst", "contact.markdown"]) $ do
+        route   $ setExtension "html"
+        compile $ do
+            getResourceBody
+            >>= return . fmap handleWikiLinks
+            >>= renderPandoc
+            >>= loadAndApplyTemplate "templates/default.html" defaultContext
+            >>= relativizeUrls
+```

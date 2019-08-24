@@ -17,13 +17,7 @@ import Data.List (intercalate)
 import Data.Either (fromRight)
 import Data.Char
 
--- attempts to work with Hakyll Metadata, which is really a JSON Object, which
--- is really an Aeson object, which is really a HashMap from
--- unordered-containers. Some of these are probably unnecessary.
-import Hakyll.Core.Metadata
 import qualified Data.HashMap.Strict as M
-import qualified Data.Text as T -- Metadata key type
-import Data.Yaml hiding (Parser) -- Metadata value type
 
 -- boilerplate ---------------------------------------------------------------
 regularParse :: Parser a -> String -> Either ParseError a
@@ -103,7 +97,7 @@ unquotedValue     = many1 (noneOf "\"\f\t\n\r ]")
 -- onto a markup parser) or metadata (to be collated and actioned)
 data IkiChunk = IkiChunk
     { text :: String
-    , meta :: Metadata
+    , meta :: M.HashMap String String
     } deriving (Show)
 
 handleDirective :: String -> [DirectiveParameter] -> IkiChunk
@@ -113,14 +107,14 @@ handleDirective directive params =
         "meta" -> let
             metaparams = M.unions
                        $ reverse -- make it right-biased. Is this necessary?
-                       $ map (\(k,v) -> M.singleton (T.pack k) (toJSON v))
+                       $ map (\(k,v) -> M.singleton k v)
                        $ map (\(DirectiveParameter l v)-> (fromJust l,v))
                        $ filter (\(DirectiveParameter l v)->isJust l) params
             in IkiChunk "" metaparams
 
         -- labels ignored for tag
-        "tag"  -> let v = toJSON $ show (map value params)
-                  in  IkiChunk "" (M.singleton (T.pack "tags") v)
+        "tag"  -> let v = show (map value params)
+                  in  IkiChunk "" (M.singleton "tags" v)
 
         _      -> IkiChunk ("<!-- unhandled directive: " ++ directive ++ "-->") M.empty
 
@@ -143,7 +137,7 @@ oink = manyTill ((try $ do
                 ) eof
 
 -- collate any metadata chunks and join text chunks together
-handleWikiLinks :: String -> (String, Metadata)
+handleWikiLinks :: String -> (String, M.HashMap String String)
 handleWikiLinks s =
     case (parse oink "" s) of -- :: Either ParseError [IkiChunk]
         Left  _ -> (s, M.empty)

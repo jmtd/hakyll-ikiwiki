@@ -1,0 +1,10 @@
+---
+title: tags
+date: Sun, 25 Aug 2019 21:34:45 +0100
+tags: tagsInPreamble
+---
+
+This is a short demo of some ikiwiki features like [[wikilinks]]
+and using [[!tag tagInline]] the tag directive and demonstrating
+their effect on the page as output by Hakyll.
+[[!meta title="Tags, etc."]]

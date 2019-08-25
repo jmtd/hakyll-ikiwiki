@@ -3,6 +3,8 @@
 import           Data.Monoid (mappend)
 import           Hakyll
 
+import           IkiWiki
+import qualified Data.HashMap.Strict as M
 
 --------------------------------------------------------------------------------
 main :: IO ()
@@ -13,10 +15,18 @@ main = hakyll $ do
 
     match "posts/*" $ do
         route $ setExtension "html"
-        compile $ pandocCompiler
-            >>= loadAndApplyTemplate "templates/post.html"    postCtx
-            >>= loadAndApplyTemplate "templates/default.html" postCtx
-            >>= relativizeUrls
+
+        compile $ do
+            body <- getResourceBody
+            let (body', md) = handleWikiLinks (itemBody body)
+            let metadataCtxs =
+                 map (\(k,v) -> constField k v) (M.toList md)
+            let ctx = (mconcat metadataCtxs) `mappend` postCtx
+            do
+                renderPandoc (itemSetBody body' body)
+                >>= loadAndApplyTemplate "templates/post.html"    ctx
+                >>= loadAndApplyTemplate "templates/default.html" ctx
+                >>= relativizeUrls
 
     match "index.html" $ do
         route idRoute

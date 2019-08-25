@@ -28,18 +28,11 @@ translating them into Hakyll's template tokens (e.g.
 
 ## Example in use
 
-I will add a complete demo Hakyll site to this repository eventually. Here's a
-snippet showing how to integrate:
+The `site.hs` is a simple example Hakyll program, derived from the basic template
+that `hakyll-init` generates for you. I've trimmed it a little bit and integrated
+`IkiWiki.hs` into it. The content in `css` and `images` is unchanged; `posts` has
+blog posts that demonstrate IkiWiki-style interlinks and directives in use.
 
-```
-import           IkiWiki
-…
-    match (fromList ["about.rst", "contact.markdown"]) $ do
-        route   $ setExtension "html"
-        compile $ do
-            getResourceBody
-            >>= return . fmap handleWikiLinks
-            >>= renderPandoc
-            >>= loadAndApplyTemplate "templates/default.html" defaultContext
-            >>= relativizeUrls
-```
+`hakyll-ikiwiki.cabal` and `stack.yaml` are (for now) specific to this
+demonstration. You can use either [Haskell Stack](https://docs.haskellstack.org/en/stable/README/)
+or [Cabal](https://www.haskell.org/cabal/) to build the demo site.

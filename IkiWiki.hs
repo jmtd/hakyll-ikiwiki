@@ -8,7 +8,7 @@
 
 module IkiWiki (handleWikiLinks) where
 
-import Text.Parsec
+import Text.Parsec hiding (label)
 import Text.Parsec.Char
 import Text.Parsec.String (Parser)
 import Text.Pandoc.Parsing  hiding (Parser)-- many1Till etc
@@ -115,6 +115,14 @@ handleDirective directive params =
         -- labels ignored for tag
         "tag"  -> let v = show (map value params)
                   in  IkiChunk "" (M.singleton "tags" v)
+
+        -- hmM!
+        "template" -> let idv = value
+                              $ head
+                              $ filter (\p -> "id" == fromJust (label p))
+                              $ filter (\p -> isJust (label p))
+                                params
+                      in  IkiChunk ("$partial(\"templates/"++idv++".html\")$") M.empty
 
         _      -> IkiChunk ("<!-- unhandled directive: " ++ directive ++ "-->") M.empty
 

@@ -1,0 +1,9 @@
+---
+title: templates
+date: Tue, 27 Aug 2019 15:29:01 +0100
+---
+
+this is an attempt to translate ikiwiki templates, foo and bar.
+
+foo: [[!template id=foo]]
+bar: [[!template id="bar"]]

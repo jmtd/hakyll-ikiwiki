@@ -116,13 +116,13 @@ handleDirective directive params =
         "tag"  -> let v = show (map value params)
                   in  IkiChunk "" (M.singleton "tags" v)
 
-        -- hmM!
-        "template" -> let idv = value
-                              $ head
-                              $ filter (\p -> "id" == fromJust (label p))
-                              $ filter (\p -> isJust (label p))
-                                params
-                      in  IkiChunk ("$partial(\"templates/"++idv++".html\")$") M.empty
+        -- templates: Id parameter required. XXX no other parameters supported yet
+        "template" -> let
+            params' = map (\(DirectiveParameter l v) -> (l,v)) params
+            txt = case lookup (Just "id") params' of
+                Nothing  -> "template missing id parameter"
+                Just idv -> "$partial(\"templates/"++idv++".html\")$"
+            in IkiChunk txt M.empty
 
         _      -> IkiChunk ("<!-- unhandled directive: " ++ directive ++ "-->") M.empty
 

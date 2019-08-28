@@ -40,8 +40,9 @@ main = hakyll $ do
             let metadataCtxs =
                  map (\(k,v) -> constField k v) (M.toList md)
             let ctx = (mconcat metadataCtxs) `mappend` (postCtxWithTags tags)
-            do
-                renderPandoc (itemSetBody body' body)
+
+            applyAsTemplate ctx (itemSetBody body' body)
+                >>= renderPandoc
                 >>= loadAndApplyTemplate "templates/post.html"    ctx
                 >>= loadAndApplyTemplate "templates/default.html" ctx
                 >>= relativizeUrls

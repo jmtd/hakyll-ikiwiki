@@ -6,7 +6,7 @@
  - License: BSD-3-Clause (see COPYING)
  -}
 
-module IkiWiki (handleWikiLinks) where
+module IkiWiki (ikiRoute, handleWikiLinks) where
 
 import Text.Parsec hiding (label)
 import Text.Parsec.Char
@@ -16,8 +16,14 @@ import Data.Maybe (fromMaybe, isJust, fromJust)
 import Data.List (intercalate)
 import Data.Either (fromRight)
 import Data.Char
+import System.FilePath
+import Hakyll (toFilePath)
 
 import qualified Data.HashMap.Strict as M
+
+--------------------------------------------------------------------------------
+-- "foo/bar.html" → "foo/bar/index.html"
+ikiRoute x = dropExtension (toFilePath x) </> "index.html"
 
 -- boilerplate ---------------------------------------------------------------
 regularParse :: Parser a -> String -> Either ParseError a

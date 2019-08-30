@@ -5,8 +5,8 @@ import           Hakyll
 
 import           IkiWiki
 import qualified Data.HashMap.Strict as M
-
 --------------------------------------------------------------------------------
+
 main :: IO ()
 main = hakyll $ do
     match ("images/*" .||. "css/*") $ do
@@ -32,8 +32,7 @@ main = hakyll $ do
                 >>= relativizeUrls
 
     match "posts/*" $ do
-        route $ setExtension "html"
-
+        route $ customRoute ikiRoute
         compile $ do
             body <- getResourceBody
             let (body', md) = handleWikiLinks (itemBody body)

@@ -6,7 +6,7 @@
  - License: BSD-3-Clause (see COPYING)
  -}
 
-module IkiWiki (ikiRoute, handleWikiLinks) where
+module IkiWiki (ikiRoute, ikiCtx, handleWikiLinks) where
 
 import Text.Parsec hiding (label)
 import Text.Parsec.Char
@@ -17,13 +17,19 @@ import Data.List (intercalate)
 import Data.Either (fromRight)
 import Data.Char
 import System.FilePath
-import Hakyll (toFilePath)
+import Hakyll (toFilePath, mapContext, urlField, Context)
 
 import qualified Data.HashMap.Strict as M
 
 --------------------------------------------------------------------------------
 -- "foo/bar.html" → "foo/bar/index.html"
 ikiRoute x = dropExtension (toFilePath x) </> "index.html"
+
+ikiCtx :: Context a
+ikiCtx = mapContext transform (urlField "url") where
+    transform uri = case splitFileName uri of
+        (p, "index.html") -> p
+        _                 -> uri
 
 -- boilerplate ---------------------------------------------------------------
 regularParse :: Parser a -> String -> Either ParseError a
